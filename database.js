@@ -3,7 +3,7 @@
 // Each day contains Mess A and Mess B menus organized by meal sections.
 
 const messMenu = {
-  monday: {
+  sunday: {
     A: {
       breakfast: [
         "Masala Dosa",
@@ -77,7 +77,7 @@ const messMenu = {
       ]
     }
   },
-  tuesday: {
+  monday: {
     A: {
       breakfast: [
         "Pesaratttu Dosa",
@@ -153,7 +153,7 @@ const messMenu = {
       ]
     }
   },
-  wednesday: {
+  tuesday: {
     A: {
       breakfast: [
         "Poori, Aloo Kuruma",
@@ -229,7 +229,7 @@ const messMenu = {
       ]
     }
   },
-  thursday: {
+  wednesday: {
     A: {
       breakfast: [
         "Pongal",
@@ -303,7 +303,7 @@ const messMenu = {
       ]
     }
   },
-  friday: {
+  thursday: {
     A: {
       breakfast: [
         "Onion Dosa",
@@ -378,7 +378,7 @@ const messMenu = {
       ]
     }
   },
-  saturday: {
+  friday: {
     A: {
       breakfast: [
         "Idli + Vada",
@@ -449,7 +449,7 @@ const messMenu = {
       ]
     }
   },
-  sunday: {
+  saturday: {
     A: {
       breakfast: [
         "Mixed Fruits",
