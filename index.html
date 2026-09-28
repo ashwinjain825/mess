@@ -15,26 +15,28 @@
 
     <nav class="days-nav" aria-label="Weekday selection">
       <div class="days-scroll" id="daysContainer">
-        <button type="button" class="day-btn" data-day="monday">Monday</button>
-        <button type="button" class="day-btn" data-day="tuesday">Tuesday</button>
-        <button type="button" class="day-btn" data-day="wednesday">Wednesday</button>
-        <button type="button" class="day-btn" data-day="thursday">Thursday</button>
-        <button type="button" class="day-btn" data-day="friday">Friday</button>
-        <button type="button" class="day-btn" data-day="saturday">Saturday</button>
-        <button type="button" class="day-btn" data-day="sunday">Sunday</button>
+        <button type="button" class="day-btn" data-day="monday">Mon</button>
+        <button type="button" class="day-btn" data-day="tuesday">Tue</button>
+        <button type="button" class="day-btn" data-day="wednesday">Wed</button>
+        <button type="button" class="day-btn" data-day="thursday">Thu</button>
+        <button type="button" class="day-btn" data-day="friday">Fri</button>
+        <button type="button" class="day-btn" data-day="saturday">Sat</button>
+        <button type="button" class="day-btn" data-day="sunday">Sun</button>
       </div>
     </nav>
 
     <section class="controls-bar">
-      <h1 class="current-selection-title" id="menuTitle">Monday Menu</h1>
+      <div class="status-summary" id="statusSummary">
+        <!-- Day and Active/Upcoming indicator -->
+      </div>
       <div class="mess-toggle" role="group" aria-label="Mess switch">
         <button type="button" class="mess-btn" id="messBBtn" data-mess="B">Mess B</button>
         <button type="button" class="mess-btn" id="messABtn" data-mess="A">Mess A</button>
       </div>
     </section>
 
-    <main class="menu-sections" id="menuSections">
-      <!-- Dynamically rendered meals -->
+    <main class="menu-content" id="menuContent">
+      <!-- Dynamically rendered active meal or outside hours status -->
     </main>
   </div>
 

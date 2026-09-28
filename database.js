@@ -524,3 +524,19 @@ const messMenu = {
     }
   }
 };
+
+// Meal schedule timings (start and end times in 24h HH:MM format)
+const mealSchedule = {
+  weekday: [
+    { id: "breakfast", name: "Breakfast", start: "07:30", end: "09:00", displayTime: "7:30 AM – 9:00 AM" },
+    { id: "lunch",     name: "Lunch",     start: "12:30", end: "14:00", displayTime: "12:30 PM – 2:00 PM" },
+    { id: "snacks",    name: "Snacks",    start: "17:00", end: "18:00", displayTime: "5:00 PM – 6:00 PM" },
+    { id: "dinner",    name: "Dinner",    start: "19:30", end: "21:00", displayTime: "7:30 PM – 9:00 PM" }
+  ],
+  weekend: [
+    { id: "breakfast", name: "Breakfast", start: "07:30", end: "09:30", displayTime: "7:30 AM – 9:30 AM" },
+    { id: "lunch",     name: "Lunch",     start: "12:30", end: "14:30", displayTime: "12:30 PM – 2:30 PM" },
+    { id: "snacks",    name: "Snacks",    start: "17:00", end: "18:00", displayTime: "5:00 PM – 6:00 PM" },
+    { id: "dinner",    name: "Dinner",    start: "19:30", end: "21:30", displayTime: "7:30 PM – 9:30 PM" }
+  ]
+};

@@ -101,17 +101,22 @@ body {
   font-weight: 600;
 }
 
-/* Controls Bar: Title & Mess Switch */
+/* Controls Bar: Title/Status & Mess Switch */
 .controls-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 12px 20px;
+  padding: 14px 20px 10px 20px;
   gap: 12px;
 }
 
-.current-selection-title {
-  font-size: 1.1rem;
+.status-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-day {
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--text-main);
 }
@@ -122,6 +127,7 @@ body {
   border-radius: 4px;
   overflow: hidden;
   background-color: var(--bg-color);
+  flex-shrink: 0;
 }
 
 .mess-btn {
@@ -141,29 +147,82 @@ body {
   font-weight: 600;
 }
 
-/* Menu Meal Sections */
-.menu-sections {
-  padding: 4px 20px 32px 20px;
+/* Menu Content Area */
+.menu-content {
+  padding: 8px 20px 32px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
+/* Collapsible Meal Card */
 .meal-card {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--surface-color);
+  overflow: hidden;
 }
 
-.meal-header {
-  padding: 10px 16px;
+/* Clickable Accordion Header Button */
+.meal-header-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
   background-color: var(--bg-color);
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.95rem;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.meal-header-btn:hover {
+  background-color: #f1f3f5;
+}
+
+.meal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meal-name {
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--text-main);
+  line-height: 1.2;
+}
+
+.meal-timing {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.meal-state-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background-color: var(--surface-color);
+}
+
+/* Collapsible Panel Content */
+.meal-body {
+  border-top: 1px solid var(--border-color);
+}
+
+.meal-card.collapsed .meal-body {
+  display: none;
+}
+
+.meal-card:not(.collapsed) .meal-body {
+  display: block;
 }
 
 .meal-items-list {
@@ -185,7 +244,7 @@ body {
 }
 
 .no-data-msg {
-  padding: 16px;
+  padding: 14px 16px;
   color: var(--text-muted);
   font-size: 0.9rem;
   font-style: italic;
