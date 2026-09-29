@@ -42,6 +42,14 @@ body {
   padding: 16px 20px 12px 20px;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--surface-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
 }
 
 .header-title {
@@ -55,6 +63,27 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+.visit-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f1f5f9;
+  border: 1px solid var(--border-color);
+  padding: 5px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.visit-icon {
+  font-size: 0.85rem;
+}
+
+.visit-counter strong {
+  color: var(--text-main);
+  font-weight: 700;
 }
 
 /* Weekday Horizontal Selector */

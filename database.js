@@ -1,8 +1,6 @@
-// IIITDM Kurnool - Mess Menu Data extracted from Mess Menu Comparison PDF
-// Days: monday, tuesday, wednesday, thursday, friday, saturday, sunday
-// Each day contains Mess A and Mess B menus organized by meal sections.
-
-const messMenu = {
+// IIITDM Kurnool - Mess Menu Data
+// Initial fallback menu while Firestore loads:
+window.messMenu = {
   sunday: {
     A: {
       breakfast: [
@@ -526,7 +524,7 @@ const messMenu = {
 };
 
 // Meal schedule timings (start and end times in 24h HH:MM format)
-const mealSchedule = {
+window.mealSchedule = {
   weekday: [
     { id: "breakfast", name: "Breakfast", start: "07:30", end: "09:00", displayTime: "7:30 AM – 9:00 AM" },
     { id: "lunch",     name: "Lunch",     start: "12:30", end: "14:00", displayTime: "12:30 PM – 2:00 PM" },
@@ -540,3 +538,135 @@ const mealSchedule = {
     { id: "dinner",    name: "Dinner",    start: "19:30", end: "21:30", displayTime: "7:30 PM – 9:30 PM" }
   ]
 };
+
+// Aliases for non-module compatibility
+const messMenu = window.messMenu;
+const mealSchedule = window.mealSchedule;
+
+// --- FIRESTORE INTEGRATION ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  increment,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+let dbInstance = null;
+
+function getDb() {
+  if (!dbInstance) {
+    const app = initializeApp(firebaseConfig);
+    dbInstance = getFirestore(app);
+  }
+  return dbInstance;
+}
+
+/**
+ * Fetch all mess menu data at once from Firestore
+ */
+export async function fetchMessMenuFromFirestore() {
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+    console.warn(
+      "[Firestore] Placeholder Firebase credentials detected in firebase-config.js. Using local fallback menu data."
+    );
+    return window.messMenu;
+  }
+
+  try {
+    const db = getDb();
+    console.log("[Firestore] Fetching mess menu data from Firestore...");
+
+    let fetchedData = {};
+
+    // 1. Try reading collection 'messMenu' (e.g., individual documents for each day: 'monday', 'tuesday', etc.)
+    const collectionSnap = await getDocs(collection(db, "messMenu"));
+    if (!collectionSnap.empty) {
+      collectionSnap.forEach((docSnap) => {
+        const docId = docSnap.id.toLowerCase().trim();
+        if (docId === "schedule") {
+          // If schedule is stored in messMenu/schedule, update window.mealSchedule
+          window.mealSchedule = docSnap.data();
+          console.log("[Firestore] Meal schedule updated from Firestore:", window.mealSchedule);
+        } else {
+          fetchedData[docId] = docSnap.data();
+        }
+      });
+    } else {
+      // 2. Fallback check: maybe stored in a single document under 'mess/menu' or 'messMenu/all'
+      const singleDocRef = doc(db, "mess", "menu");
+      const singleDocSnap = await getDoc(singleDocRef);
+      if (singleDocSnap.exists()) {
+        const fullData = singleDocSnap.data();
+        if (fullData.schedule) {
+          window.mealSchedule = fullData.schedule;
+        }
+        fetchedData = fullData;
+      }
+    }
+
+    if (Object.keys(fetchedData).length > 0) {
+      // Update global messMenu
+      window.messMenu = fetchedData;
+      console.log("[Firestore] Menu successfully loaded from Firestore:", window.messMenu);
+
+      // Notify the app that new menu data has arrived
+      window.dispatchEvent(new CustomEvent("messMenuUpdated", { detail: window.messMenu }));
+    } else {
+      console.warn("[Firestore] No documents found in Firestore 'messMenu' collection. Retaining fallback.");
+    }
+  } catch (error) {
+    console.error("[Firestore] Error fetching menu data from Firestore:", error);
+  }
+
+  return window.messMenu;
+}
+
+/**
+ * Record a visit and retrieve the updated count
+ */
+export async function recordAndFetchVisitCount() {
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+    return;
+  }
+
+  try {
+    const db = getDb();
+    const statsRef = doc(db, "stats", "visits");
+
+    // Increment counter atomically on every single page load
+    await setDoc(
+      statsRef,
+      {
+        count: increment(1),
+        lastVisitedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    // Read the current total count
+    const statsSnap = await getDoc(statsRef);
+    if (statsSnap.exists()) {
+      const visitData = statsSnap.data();
+      const currentCount = visitData.count || 1;
+      const counterEl = document.getElementById("visitCountNumber");
+      if (counterEl) {
+        counterEl.textContent = Number(currentCount).toLocaleString();
+      }
+    }
+  } catch (err) {
+    console.warn("[Firestore] Could not update/read visit count:", err);
+  }
+}
+
+// Auto-run fetch and visitor count
+fetchMessMenuFromFirestore();
+recordAndFetchVisitCount();
+
+

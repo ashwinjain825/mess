@@ -1,0 +1,118 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // This security rules file assumes the following data structures:
+    //
+    // 1. Primary Collection: messMenu
+    //    Document ID: day name (e.g. 'monday', 'tuesday', ..., 'sunday') or 'schedule' / 'all'
+    //    Fields:
+    //      - Mess variant maps (e.g. 'A', 'B'), each containing meal list fields:
+    //        - breakfast: list of strings (menu items)
+    //        - lunch: list of strings (menu items)
+    //        - snacks: list of strings (menu items)
+    //        - dinner: list of strings (menu items)
+    //
+    // 2. Secondary Collection: mess
+    //    Document ID: 'menu' (single consolidated menu document fallback)
+    //    Fields:
+    //      - Map containing days ('monday', 'tuesday', etc.) and their mess menu objects
+    //
+    // 3. Stats / Counter Collection: stats (and siteStats alias)
+    //    Document ID: 'visits'
+    //    Fields:
+    //      - count: int (required, positive integer >= 1) - total visitor count
+    //      - lastVisitedAt: timestamp (optional) - timestamp of the latest recorded visit
+    //      - updatedAt: timestamp (optional) - timestamp when document was updated
+    //
+    // Access Requirements:
+    //  - messMenu & mess:
+    //    - Read: Public / unauthenticated access (anyone can view the mess menu).
+    //    - Write (create, update, delete): Explicitly denied from client SDKs.
+    //      Menu management is strictly maintained via Firebase Admin SDK / Admin Console.
+    //  - stats/visits & siteStats/visits:
+    //    - Read: Public / unauthenticated access (anyone can view visitor stats).
+    //    - Create: Allowed if counter is initialized with valid positive integer count.
+    //    - Update: Allowed if counter strictly increments (count + 1 or valid increment >= resource count)
+    //      and no prohibited fields or unauthorized mutations occur.
+    //    - Delete: Explicitly disallowed.
+    //
+    // ===============================================================
+
+    // Default deny all access across database
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // Helper Functions & Validators
+    // ===============================================================
+
+    // Check if the visits document has only permitted fields
+    function hasOnlyAllowedVisitFields() {
+      return request.resource.data.keys().hasOnly(['count', 'lastVisitedAt', 'updatedAt']);
+    }
+
+    // Validate visits document schema on create
+    function isValidVisitCreate() {
+      return hasOnlyAllowedVisitFields() &&
+        request.resource.data.count is int &&
+        request.resource.data.count >= 1 &&
+        (!('lastVisitedAt' in request.resource.data) || request.resource.data.lastVisitedAt is timestamp) &&
+        (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt is timestamp);
+    }
+
+    // Validate visits document schema and increment logic on update
+    function isValidVisitUpdate() {
+      return hasOnlyAllowedVisitFields() &&
+        request.resource.data.count is int &&
+        // Protect against counter reset or decrease: must strictly increase or increment by 1
+        request.resource.data.count > resource.data.count &&
+        (!('lastVisitedAt' in request.resource.data) || request.resource.data.lastVisitedAt is timestamp) &&
+        (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt is timestamp);
+    }
+
+    // Public read-only access for messMenu collection and any nested docs/subcollections
+    match /messMenu/{docId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /{subCollection=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // Public read-only access for mess collection (e.g., fallback mess/menu doc)
+    match /mess/{docId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /{subCollection=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // Visitor counter at stats/visits
+    match /stats/{docId} {
+      allow read: if docId == 'visits';
+      allow create: if docId == 'visits' && isValidVisitCreate();
+      allow update: if docId == 'visits' && isValidVisitUpdate();
+      allow delete: if false;
+    }
+
+    // Alias / fallback for siteStats/visits
+    match /siteStats/{docId} {
+      allow read: if docId == 'visits';
+      allow create: if docId == 'visits' && isValidVisitCreate();
+      allow update: if docId == 'visits' && isValidVisitUpdate();
+      allow delete: if false;
+    }
+  }
+}

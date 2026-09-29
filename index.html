@@ -9,8 +9,14 @@
 <body>
   <div class="container">
     <header class="header">
-      <div class="header-title">Mess Menu</div>
-      <div class="header-subtitle">IIITDM Kurnool</div>
+      <div class="header-left">
+        <div class="header-title">Mess Menu</div>
+        <div class="header-subtitle">IIITDM Kurnool</div>
+      </div>
+      <div class="visit-counter" id="visitCounter" title="Total website visits">
+        <span class="visit-icon">👁</span>
+        <span class="visit-text">Visits: <strong id="visitCountNumber">--</strong></span>
+      </div>
     </header>
 
     <nav class="days-nav" aria-label="Weekday selection">
@@ -40,7 +46,7 @@
     </main>
   </div>
 
-  <script src="database.js"></script>
+  <script type="module" src="database.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

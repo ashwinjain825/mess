@@ -41,7 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getScheduleForDay(dayKey) {
-    return isWeekend(dayKey) ? mealSchedule.weekend : mealSchedule.weekday;
+    const activeSchedule = window.mealSchedule || mealSchedule;
+    return isWeekend(dayKey) ? activeSchedule.weekend : activeSchedule.weekday;
   }
 
   /**
@@ -247,6 +248,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial setup for today and initial render
   ensureDayExpandedState(todayDayKey, true);
   render();
+
+  // Re-render automatically when data arrives from Firestore
+  window.addEventListener("messMenuUpdated", () => {
+    console.log("[App] Updating UI with newly fetched Firestore menu data...");
+    render();
+  });
 
   // Periodic check (every 30 seconds) for time transitions on TODAY only
   setInterval(() => {
