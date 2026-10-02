@@ -90,9 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } else {
       if (!expandedMealsPerDay[dayKey]) {
-        // For other days, all meals are available. Default all expanded for complete viewing.
+        // Default to the first meal for other days, keeping only one open
         const schedule = getScheduleForDay(dayKey);
-        expandedMealsPerDay[dayKey] = new Set(schedule.map(m => m.id));
+        expandedMealsPerDay[dayKey] = new Set(schedule.length > 0 ? [schedule[0].id] : []);
       }
     }
   }
@@ -165,32 +165,56 @@ document.addEventListener("DOMContentLoaded", () => {
       titleGroup.appendChild(nameEl);
       titleGroup.appendChild(timeEl);
 
-      const stateBadge = document.createElement("span");
-      stateBadge.className = "meal-state-text";
-      stateBadge.textContent = isExpanded ? "Hide" : "Show";
+      const iconWrapper = document.createElement("span");
+      iconWrapper.className = "meal-toggle-icon";
+      iconWrapper.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      `;
 
       headerBtn.appendChild(titleGroup);
-      headerBtn.appendChild(stateBadge);
+      headerBtn.appendChild(iconWrapper);
 
-      // Accordion click handler
+      // Accordion click handler: only one meal card is open at a time
       headerBtn.addEventListener("click", () => {
         if (isToday) {
           userInteractedWithToday = true;
         }
 
-        if (expandedSet.has(meal.id)) {
+        const currentlyExpanded = expandedSet.has(meal.id);
+
+        if (currentlyExpanded) {
+          // If clicked the currently open one, collapse it
           expandedSet.delete(meal.id);
+          card.classList.add("collapsed");
+          headerBtn.setAttribute("aria-expanded", "false");
         } else {
+          // Close any other open meal cards smoothly
+          menuContent.querySelectorAll(".meal-card:not(.collapsed)").forEach((openCard) => {
+            if (openCard !== card) {
+              openCard.classList.add("collapsed");
+              const btn = openCard.querySelector(".meal-header-btn");
+              if (btn) btn.setAttribute("aria-expanded", "false");
+            }
+          });
+
+          // Open selected meal card
+          expandedSet.clear();
           expandedSet.add(meal.id);
+          card.classList.remove("collapsed");
+          headerBtn.setAttribute("aria-expanded", "true");
         }
-        render();
       });
 
       card.appendChild(headerBtn);
 
-      // Meal body with items
+      // Meal body with items and animated grid inner wrapper
       const body = document.createElement("div");
       body.className = "meal-body";
+
+      const bodyInner = document.createElement("div");
+      bodyInner.className = "meal-body-inner";
 
       const items = dayData ? (dayData[meal.id] || []) : [];
 
@@ -198,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const noItem = document.createElement("div");
         noItem.className = "no-data-msg";
         noItem.textContent = "No items listed for this meal.";
-        body.appendChild(noItem);
+        bodyInner.appendChild(noItem);
       } else {
         const list = document.createElement("ul");
         list.className = "meal-items-list";
@@ -210,9 +234,10 @@ document.addEventListener("DOMContentLoaded", () => {
           list.appendChild(li);
         });
 
-        body.appendChild(list);
+        bodyInner.appendChild(list);
       }
 
+      body.appendChild(bodyInner);
       card.appendChild(body);
       menuContent.appendChild(card);
     });

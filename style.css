@@ -229,29 +229,56 @@ body {
   font-weight: 500;
 }
 
-.meal-state-text {
-  font-size: 0.8rem;
-  font-weight: 600;
+.meal-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 3px 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  background-color: var(--surface-color);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease, background-color 0.2s ease;
 }
 
-/* Collapsible Panel Content */
+.meal-header-btn:hover .meal-toggle-icon {
+  color: var(--text-main);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Rotate icon when expanded vs collapsed */
+.meal-card:not(.collapsed) .meal-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.meal-card.collapsed .meal-toggle-icon {
+  transform: rotate(0deg);
+}
+
+/* Collapsible Panel Content with Smooth Grid Transition */
 .meal-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-top: 1px solid var(--border-color);
 }
 
 .meal-card.collapsed .meal-body {
-  display: none;
+  grid-template-rows: 0fr;
+  border-top-color: transparent;
 }
 
-.meal-card:not(.collapsed) .meal-body {
-  display: block;
+.meal-card.collapsed {
+  border-color: var(--border-color);
+}
+
+.meal-body-inner {
+  overflow: hidden;
+  transition: opacity 0.25s ease;
+  opacity: 1;
+}
+
+.meal-card.collapsed .meal-body-inner {
+  opacity: 0;
 }
 
 .meal-items-list {
