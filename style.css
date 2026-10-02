@@ -377,6 +377,22 @@ body {
   font-style: italic;
 }
 
+/* Footer & Developer Credit */
+.footer {
+  margin-top: auto;
+  padding: 8px 20px 18px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.developer-credit {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+  user-select: none;
+}
+
 /* Responsive adjustments */
 @media (min-width: 641px) {
   .container {
