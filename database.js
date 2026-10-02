@@ -552,6 +552,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  addDoc,
   increment,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -664,6 +665,37 @@ export async function recordAndFetchVisitCount() {
     console.warn("[Firestore] Could not update/read visit count:", err);
   }
 }
+
+/**
+ * Submit feedback or complaint to Firestore 'feedbacks' collection
+ */
+export async function submitFeedback(feedbackData) {
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+    console.warn("[Firestore] Placeholder Firebase credentials. Logging feedback locally:", feedbackData);
+    // Return mock success for local testing
+    return { success: true, localOnly: true };
+  }
+
+  try {
+    const db = getDb();
+    const docRef = await addDoc(collection(db, "feedbacks"), {
+      rollNo: String(feedbackData.rollNo || "").trim(),
+      mess: String(feedbackData.mess || "").trim(),
+      day: String(feedbackData.day || "").trim().toLowerCase(),
+      meal: String(feedbackData.meal || "").trim().toLowerCase(),
+      rating: Number(feedbackData.rating),
+      comment: String(feedbackData.comment || "").trim(),
+      createdAt: serverTimestamp()
+    });
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("[Firestore] Error submitting feedback:", error);
+    throw error;
+  }
+}
+
+// Expose on window for non-module scripts
+window.submitFeedback = submitFeedback;
 
 // Auto-run fetch and visitor count
 fetchMessMenuFromFirestore();

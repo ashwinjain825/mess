@@ -30,6 +30,17 @@ service cloud.firestore {
     //      - lastVisitedAt: timestamp (optional) - timestamp of the latest recorded visit
     //      - updatedAt: timestamp (optional) - timestamp when document was updated
     //
+    // 4. Feedback Collection: feedbacks
+    //    Document ID: Auto-generated document ID
+    //    Fields:
+    //      - rollNo: string (1-30 chars, required)
+    //      - mess: string ('A' or 'B', required)
+    //      - day: string ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', required)
+    //      - meal: string ('breakfast', 'lunch', 'snacks', 'dinner', required)
+    //      - rating: int (1 to 5, required)
+    //      - comment: string (0 to 1000 chars, optional/required string)
+    //      - createdAt: timestamp (serverTimestamp(), required)
+    //
     // Access Requirements:
     //  - messMenu & mess:
     //    - Read: Public / unauthenticated access (anyone can view the mess menu).
@@ -41,6 +52,9 @@ service cloud.firestore {
     //    - Update: Allowed if counter strictly increments (count + 1 or valid increment >= resource count)
     //      and no prohibited fields or unauthorized mutations occur.
     //    - Delete: Explicitly disallowed.
+    //  - feedbacks:
+    //    - Read, Update, Delete: Denied to unauthenticated clients (Admin/privileged only via backend).
+    //    - Create: Allowed publicly for submissions complying with schema, type, and size constraints.
     //
     // ===============================================================
 
@@ -52,6 +66,16 @@ service cloud.firestore {
     // ===============================================================
     // Helper Functions & Validators
     // ===============================================================
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
 
     // Check if the visits document has only permitted fields
     function hasOnlyAllowedVisitFields() {
@@ -75,6 +99,24 @@ service cloud.firestore {
         request.resource.data.count > resource.data.count &&
         (!('lastVisitedAt' in request.resource.data) || request.resource.data.lastVisitedAt is timestamp) &&
         (!('updatedAt' in request.resource.data) || request.resource.data.updatedAt is timestamp);
+    }
+
+    // Validate feedbacks document schema on create
+    function isValidFeedback(data) {
+      return hasOnlyAllowedFields(['rollNo', 'mess', 'day', 'meal', 'rating', 'comment', 'createdAt']) &&
+        // Required fields check
+        data.keys().hasAll(['rollNo', 'mess', 'day', 'meal', 'rating', 'createdAt']) &&
+        // Field constraints
+        validStringLength('rollNo', 1, 30) &&
+        data.mess in ['A', 'B'] &&
+        data.day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] &&
+        data.meal in ['breakfast', 'lunch', 'snacks', 'dinner'] &&
+        data.rating is int &&
+        data.rating >= 1 &&
+        data.rating <= 5 &&
+        (!('comment' in data) || (data.comment is string && data.comment.size() <= 1000)) &&
+        data.createdAt is timestamp &&
+        data.createdAt <= request.time;
     }
 
     // Public read-only access for messMenu collection and any nested docs/subcollections
@@ -112,6 +154,14 @@ service cloud.firestore {
       allow read: if docId == 'visits';
       allow create: if docId == 'visits' && isValidVisitCreate();
       allow update: if docId == 'visits' && isValidVisitUpdate();
+      allow delete: if false;
+    }
+
+    // Feedbacks collection
+    match /feedbacks/{feedbackId} {
+      allow read: if false;
+      allow create: if isValidFeedback(request.resource.data);
+      allow update: if false;
       allow delete: if false;
     }
   }

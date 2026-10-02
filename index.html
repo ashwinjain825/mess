@@ -3,22 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mess Menu - IIITDM Kurnool</title>
+  <title>Bhati Mess - IIITDM Kurnool</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1.0">
 </head>
 <body>
   <div class="container">
     <header class="header">
       <div class="header-left">
-        <div class="header-title">Mess Menu</div>
+        <div class="header-title">Bhati Mess</div>
         <div class="header-subtitle">IIITDM Kurnool</div>
       </div>
-      <div class="visit-counter" id="visitCounter" title="Total website visits">
-        <span class="visit-icon">👁</span>
-        <span class="visit-text">Visits: <strong id="visitCountNumber">--</strong></span>
+      <div class="header-right">
+        <button type="button" class="feedback-open-btn" id="openFeedbackBtn" aria-label="Give feedback">
+          <svg class="feedback-btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Feedback</span>
+        </button>
+        <div class="visit-counter" id="visitCounter" title="Total website visits">
+          <span class="visit-icon">👁</span>
+          <span class="visit-text"><strong id="visitCountNumber">--</strong></span>
+        </div>
       </div>
     </header>
+
+    <!-- Feedback Modal Dialog Widget -->
+    <dialog class="feedback-modal" id="feedbackModal" aria-labelledby="feedbackTitle">
+      <div class="feedback-dialog-content">
+        <div class="feedback-header">
+          <div class="feedback-title-group">
+            <h2 class="feedback-title" id="feedbackTitle">Mess Feedback & Complaint</h2>
+            <p class="feedback-subtitle">Help improve mess food quality and services</p>
+          </div>
+          <button type="button" class="feedback-close-btn" id="closeFeedbackBtn" aria-label="Close feedback form">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form class="feedback-form" id="feedbackForm" novalidate>
+          <!-- Roll No -->
+          <div class="form-group">
+            <label for="fbRollNo" class="form-label">Roll Number <span class="required-star">*</span></label>
+            <input type="text" id="fbRollNo" name="rollNo" class="form-input" placeholder="e.g. 122CS0001" required maxlength="30" autocomplete="off" />
+          </div>
+
+          <!-- Mess Selection -->
+          <div class="form-group">
+            <label class="form-label">Mess <span class="required-star">*</span></label>
+            <div class="form-segmented" role="radiogroup" aria-label="Select Mess">
+              <label class="segmented-opt">
+                <input type="radio" name="fbMess" value="B" checked />
+                <span>Mess B</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbMess" value="A" />
+                <span>Mess A</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Day Selection -->
+          <div class="form-group">
+            <label class="form-label">Day <span class="required-star">*</span></label>
+            <div class="form-segmented form-segmented-days" role="radiogroup" aria-label="Select Day">
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="sunday" />
+                <span>Sun</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="monday" />
+                <span>Mon</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="tuesday" />
+                <span>Tue</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="wednesday" />
+                <span>Wed</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="thursday" />
+                <span>Thu</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="friday" />
+                <span>Fri</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbDay" value="saturday" />
+                <span>Sat</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Meal Selection -->
+          <div class="form-group">
+            <label class="form-label">Meal <span class="required-star">*</span></label>
+            <div class="form-segmented form-segmented-meals" role="radiogroup" aria-label="Select Meal">
+              <label class="segmented-opt">
+                <input type="radio" name="fbMeal" value="breakfast" checked />
+                <span>Breakfast</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbMeal" value="lunch" />
+                <span>Lunch</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbMeal" value="snacks" />
+                <span>Snacks</span>
+              </label>
+              <label class="segmented-opt">
+                <input type="radio" name="fbMeal" value="dinner" />
+                <span>Dinner</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Star Rating -->
+          <div class="form-group">
+            <label class="form-label">Rating <span class="required-star">*</span></label>
+            <div class="star-rating" id="starRatingGroup" role="radiogroup" aria-label="Meal rating from 1 to 5 stars">
+              <button type="button" class="star-btn" data-value="1" aria-label="1 Star" title="1 Star - Poor">★</button>
+              <button type="button" class="star-btn" data-value="2" aria-label="2 Stars" title="2 Stars - Fair">★</button>
+              <button type="button" class="star-btn" data-value="3" aria-label="3 Stars" title="3 Stars - Average">★</button>
+              <button type="button" class="star-btn" data-value="4" aria-label="4 Stars" title="4 Stars - Good">★</button>
+              <button type="button" class="star-btn" data-value="5" aria-label="5 Stars" title="5 Stars - Excellent">★</button>
+              <input type="hidden" id="fbRating" name="rating" value="0" required />
+            </div>
+            <span class="rating-text" id="ratingText">Select rating</span>
+          </div>
+
+          <!-- Other Feedback / Complaint -->
+          <div class="form-group">
+            <label for="fbComment" class="form-label">Other Feedback or Complain</label>
+            <textarea id="fbComment" name="comment" class="form-textarea" rows="3" maxlength="1000" placeholder="Describe taste, hygiene, quantity, or suggestions..."></textarea>
+          </div>
+
+          <!-- Error / Success Alert -->
+          <div class="form-feedback-msg" id="formStatusMsg" aria-live="polite"></div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="cancelFeedbackBtn">Cancel</button>
+            <button type="submit" class="btn-submit" id="submitFeedbackBtn">Submit Feedback</button>
+          </div>
+        </form>
+
+        <!-- Full widget success view (PhonePe style green tick) -->
+        <div class="feedback-success-view" id="feedbackSuccessView" style="display: none;">
+          <div class="success-animation-wrapper">
+            <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+              <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
+              <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+          </div>
+          <h3 class="success-title">Feedback Submitted!</h3>
+          <p class="success-subtitle">Thank you for helping us improve the mess food & service.</p>
+        </div>
+      </div>
+    </dialog>
 
     <nav class="days-nav" aria-label="Weekday selection">
       <div class="days-scroll" id="daysContainer">

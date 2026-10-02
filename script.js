@@ -302,4 +302,253 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }, 30000);
+
+  // ===============================================================
+  // Feedback Widget Modal & Form Logic
+  // ===============================================================
+  const feedbackModal = document.getElementById("feedbackModal");
+  const openFeedbackBtn = document.getElementById("openFeedbackBtn");
+  const closeFeedbackBtn = document.getElementById("closeFeedbackBtn");
+  const cancelFeedbackBtn = document.getElementById("cancelFeedbackBtn");
+  const feedbackHeader = document.querySelector(".feedback-header");
+  const feedbackForm = document.getElementById("feedbackForm");
+  const feedbackSuccessView = document.getElementById("feedbackSuccessView");
+  const formStatusMsg = document.getElementById("formStatusMsg");
+  const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+  const starBtns = document.querySelectorAll("#starRatingGroup .star-btn");
+  const fbRatingInput = document.getElementById("fbRating");
+  const ratingText = document.getElementById("ratingText");
+
+  const ratingDescriptions = {
+    1: "1 Star - Poor",
+    2: "2 Stars - Fair",
+    3: "3 Stars - Average",
+    4: "4 Stars - Good",
+    5: "5 Stars - Excellent"
+  };
+
+  let selectedRating = 0;
+
+  function setRating(rating) {
+    selectedRating = rating;
+    fbRatingInput.value = rating > 0 ? String(rating) : "";
+    
+    starBtns.forEach((btn) => {
+      const val = Number(btn.getAttribute("data-value"));
+      if (val <= rating) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+
+    if (rating > 0) {
+      ratingText.textContent = ratingDescriptions[rating] || `${rating} Stars`;
+      ratingText.style.fontStyle = "normal";
+      ratingText.style.color = "var(--text-main)";
+    } else {
+      ratingText.textContent = "Select rating";
+      ratingText.style.fontStyle = "italic";
+      ratingText.style.color = "var(--text-muted)";
+    }
+  }
+
+  // Star hover and click events
+  starBtns.forEach((btn) => {
+    const val = Number(btn.getAttribute("data-value"));
+
+    btn.addEventListener("mouseenter", () => {
+      starBtns.forEach((s) => {
+        const sVal = Number(s.getAttribute("data-value"));
+        if (sVal <= val) {
+          s.classList.add("hover-active");
+        } else {
+          s.classList.remove("hover-active");
+        }
+      });
+      ratingText.textContent = ratingDescriptions[val];
+    });
+
+    btn.addEventListener("mouseleave", () => {
+      starBtns.forEach((s) => s.classList.remove("hover-active"));
+      if (selectedRating > 0) {
+        ratingText.textContent = ratingDescriptions[selectedRating];
+      } else {
+        ratingText.textContent = "Select rating";
+      }
+    });
+
+    btn.addEventListener("click", () => {
+      setRating(val);
+    });
+  });
+
+  function showStatusMsg(text, type) {
+    formStatusMsg.textContent = text;
+    formStatusMsg.className = `form-feedback-msg ${type}`;
+  }
+
+  function clearStatusMsg() {
+    formStatusMsg.textContent = "";
+    formStatusMsg.className = "form-feedback-msg";
+  }
+
+  function openFeedback() {
+    clearStatusMsg();
+
+    // Ensure form is visible and success view is hidden
+    if (feedbackForm) feedbackForm.style.display = "flex";
+    if (feedbackHeader) feedbackHeader.style.display = "flex";
+    if (feedbackSuccessView) feedbackSuccessView.style.display = "none";
+
+    // Auto-prefill Mess from currently selected view
+    const messRadio = feedbackForm.querySelector(`input[name="fbMess"][value="${currentMess}"]`);
+    if (messRadio) messRadio.checked = true;
+
+    // Auto-prefill Day from currently selected day
+    if (selectedDay) {
+      const dayRadio = feedbackForm.querySelector(`input[name="fbDay"][value="${selectedDay}"]`);
+      if (dayRadio) dayRadio.checked = true;
+    }
+
+    // Auto-prefill Meal based on current relevant meal for today
+    const activeMeal = getRelevantMealIdForToday(new Date());
+    if (activeMeal) {
+      const mealRadio = feedbackForm.querySelector(`input[name="fbMeal"][value="${activeMeal}"]`);
+      if (mealRadio) mealRadio.checked = true;
+    }
+
+    if (typeof feedbackModal.showModal === "function") {
+      feedbackModal.showModal();
+    } else {
+      feedbackModal.setAttribute("open", "");
+    }
+
+    // Focus roll number input
+    setTimeout(() => {
+      const rollInput = document.getElementById("fbRollNo");
+      if (rollInput) rollInput.focus();
+    }, 50);
+  }
+
+  function closeFeedback() {
+    if (typeof feedbackModal.close === "function") {
+      feedbackModal.close();
+    } else {
+      feedbackModal.removeAttribute("open");
+    }
+
+    // Reset views after dialog closes
+    setTimeout(() => {
+      if (feedbackForm) feedbackForm.style.display = "flex";
+      if (feedbackHeader) feedbackHeader.style.display = "flex";
+      if (feedbackSuccessView) feedbackSuccessView.style.display = "none";
+      submitFeedbackBtn.disabled = false;
+      submitFeedbackBtn.textContent = "Submit Feedback";
+      clearStatusMsg();
+    }, 200);
+  }
+
+  if (openFeedbackBtn) {
+    openFeedbackBtn.addEventListener("click", openFeedback);
+  }
+
+  if (closeFeedbackBtn) {
+    closeFeedbackBtn.addEventListener("click", closeFeedback);
+  }
+
+  if (cancelFeedbackBtn) {
+    cancelFeedbackBtn.addEventListener("click", closeFeedback);
+  }
+
+  // Close when clicking modal backdrop
+  feedbackModal.addEventListener("click", (e) => {
+    const dialogBox = feedbackModal.querySelector(".feedback-dialog-content");
+    if (dialogBox && !dialogBox.contains(e.target)) {
+      closeFeedback();
+    }
+  });
+
+  // Handle Form Submission
+  feedbackForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearStatusMsg();
+
+    const rollNo = document.getElementById("fbRollNo").value.trim();
+    const messRadio = feedbackForm.querySelector('input[name="fbMess"]:checked');
+    const mess = messRadio ? messRadio.value : "B";
+    const dayRadio = feedbackForm.querySelector('input[name="fbDay"]:checked');
+    const day = dayRadio ? dayRadio.value : selectedDay;
+    const mealRadio = feedbackForm.querySelector('input[name="fbMeal"]:checked');
+    const meal = mealRadio ? mealRadio.value : "breakfast";
+    const comment = document.getElementById("fbComment").value.trim();
+
+    // Validation
+    if (!rollNo) {
+      showStatusMsg("Please enter your Roll Number.", "error");
+      document.getElementById("fbRollNo").focus();
+      return;
+    }
+
+    if (rollNo.length > 30) {
+      showStatusMsg("Roll number cannot exceed 30 characters.", "error");
+      return;
+    }
+
+    if (!selectedRating || selectedRating < 1 || selectedRating > 5) {
+      showStatusMsg("Please select a star rating from 1 to 5.", "error");
+      return;
+    }
+
+    const payload = {
+      rollNo,
+      mess,
+      day,
+      meal,
+      rating: selectedRating,
+      comment
+    };
+
+    submitFeedbackBtn.disabled = true;
+    submitFeedbackBtn.textContent = "Submitting...";
+
+    try {
+      if (typeof window.submitFeedback === "function") {
+        await window.submitFeedback(payload);
+      } else {
+        console.warn("[Feedback] submitFeedback not loaded yet, saving to localStorage");
+        const existing = JSON.parse(localStorage.getItem("offline_feedbacks") || "[]");
+        existing.push({ ...payload, createdAt: new Date().toISOString() });
+        localStorage.setItem("offline_feedbacks", JSON.stringify(existing));
+      }
+
+      // Hide the form and header, display PhonePe-style success animation
+      feedbackForm.style.display = "none";
+      if (feedbackHeader) feedbackHeader.style.display = "none";
+
+      // Reset and trigger animation cleanly
+      feedbackSuccessView.style.display = "flex";
+      const svg = feedbackSuccessView.querySelector(".success-checkmark");
+      if (svg) {
+        svg.style.animation = "none";
+        svg.offsetHeight; // force reflow
+        svg.style.animation = "";
+      }
+
+      // Reset form values for future openings
+      feedbackForm.reset();
+      setRating(0);
+
+      // Auto close the widget after animation completes (approx. 2.2 seconds)
+      setTimeout(() => {
+        closeFeedback();
+      }, 2200);
+
+    } catch (err) {
+      console.error("[Feedback] Submission error:", err);
+      showStatusMsg("Failed to submit feedback. Please check your connection and try again.", "error");
+      submitFeedbackBtn.disabled = false;
+      submitFeedbackBtn.textContent = "Submit Feedback";
+    }
+  });
 });
