@@ -666,27 +666,97 @@ export async function recordAndFetchVisitCount() {
   }
 }
 
+// Store ratings summary: { [day]: { [mess]: { [meal]: { sum: number, count: number } } } }
+window.mealRatings = JSON.parse(localStorage.getItem("cached_meal_ratings") || "{}");
+
+/**
+ * Fetch pre-aggregated meal ratings from Firestore 'mealRatings' collection
+ */
+export async function fetchMealRatingsFromFirestore() {
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+    return window.mealRatings;
+  }
+
+  try {
+    const db = getDb();
+    const snap = await getDocs(collection(db, "mealRatings"));
+    if (!snap.empty) {
+      const ratings = {};
+      snap.forEach((docSnap) => {
+        ratings[docSnap.id.toLowerCase().trim()] = docSnap.data();
+      });
+      window.mealRatings = ratings;
+      localStorage.setItem("cached_meal_ratings", JSON.stringify(ratings));
+      console.log("[Firestore] Precomputed meal ratings loaded:", window.mealRatings);
+      window.dispatchEvent(new CustomEvent("mealRatingsUpdated", { detail: window.mealRatings }));
+    }
+  } catch (err) {
+    console.warn("[Firestore] Could not load meal ratings summary:", err);
+  }
+
+  return window.mealRatings;
+}
+
 /**
  * Submit feedback or complaint to Firestore 'feedbacks' collection
+ * and atomically update the pre-aggregated sum and count in 'mealRatings'
  */
 export async function submitFeedback(feedbackData) {
+  const dayKey = String(feedbackData.day || "").trim().toLowerCase();
+  const messKey = String(feedbackData.mess || "").trim();
+  const mealKey = String(feedbackData.meal || "").trim().toLowerCase();
+  const ratingVal = Number(feedbackData.rating);
+
+  // Update local cache optimistically
+  if (!window.mealRatings[dayKey]) window.mealRatings[dayKey] = {};
+  if (!window.mealRatings[dayKey][messKey]) window.mealRatings[dayKey][messKey] = {};
+  if (!window.mealRatings[dayKey][messKey][mealKey]) {
+    window.mealRatings[dayKey][messKey][mealKey] = { sum: 0, count: 0 };
+  }
+  window.mealRatings[dayKey][messKey][mealKey].sum += ratingVal;
+  window.mealRatings[dayKey][messKey][mealKey].count += 1;
+  localStorage.setItem("cached_meal_ratings", JSON.stringify(window.mealRatings));
+  window.dispatchEvent(new CustomEvent("mealRatingsUpdated", { detail: window.mealRatings }));
+
   if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
     console.warn("[Firestore] Placeholder Firebase credentials. Logging feedback locally:", feedbackData);
-    // Return mock success for local testing
     return { success: true, localOnly: true };
   }
 
   try {
     const db = getDb();
+    
+    // 1. Add feedback entry to feedbacks collection
     const docRef = await addDoc(collection(db, "feedbacks"), {
       rollNo: String(feedbackData.rollNo || "").trim(),
-      mess: String(feedbackData.mess || "").trim(),
-      day: String(feedbackData.day || "").trim().toLowerCase(),
-      meal: String(feedbackData.meal || "").trim().toLowerCase(),
-      rating: Number(feedbackData.rating),
+      mess: messKey,
+      day: dayKey,
+      meal: mealKey,
+      rating: ratingVal,
       comment: String(feedbackData.comment || "").trim(),
       createdAt: serverTimestamp()
     });
+
+    // 2. Atomically increment the sum and count in mealRatings collection
+    try {
+      const ratingDocRef = doc(db, "mealRatings", dayKey);
+      await setDoc(
+        ratingDocRef,
+        {
+          [messKey]: {
+            [mealKey]: {
+              sum: increment(ratingVal),
+              count: increment(1)
+            }
+          },
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (aggErr) {
+      console.warn("[Firestore] Could not update mealRatings aggregation document:", aggErr);
+    }
+
     return { success: true, id: docRef.id };
   } catch (error) {
     console.error("[Firestore] Error submitting feedback:", error);
@@ -696,9 +766,11 @@ export async function submitFeedback(feedbackData) {
 
 // Expose on window for non-module scripts
 window.submitFeedback = submitFeedback;
+window.fetchMealRatingsFromFirestore = fetchMealRatingsFromFirestore;
 
 // Auto-run fetch and visitor count
 fetchMessMenuFromFirestore();
+fetchMealRatingsFromFirestore();
 recordAndFetchVisitCount();
 
 

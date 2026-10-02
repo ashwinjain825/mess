@@ -41,6 +41,14 @@ service cloud.firestore {
     //      - comment: string (0 to 1000 chars, optional/required string)
     //      - createdAt: timestamp (serverTimestamp(), required)
     //
+    // 5. Ratings Aggregation Collection: mealRatings
+    //    Document ID: day name ('monday', 'tuesday', ..., 'sunday')
+    //    Fields:
+    //      - Mess maps ('A', 'B'), containing meal maps ('breakfast', 'lunch', 'snacks', 'dinner'):
+    //        - sum: int (total rating sum)
+    //        - count: int (total rating submissions count)
+    //      - updatedAt: timestamp (optional)
+    //
     // Access Requirements:
     //  - messMenu & mess:
     //    - Read: Public / unauthenticated access (anyone can view the mess menu).
@@ -55,6 +63,10 @@ service cloud.firestore {
     //  - feedbacks:
     //    - Read, Update, Delete: Denied to unauthenticated clients (Admin/privileged only via backend).
     //    - Create: Allowed publicly for submissions complying with schema, type, and size constraints.
+    //  - mealRatings:
+    //    - Read: Public / unauthenticated access (anyone can view average ratings without calculating).
+    //    - Create, Update: Allowed for unauthenticated feedback submissions to increment sum and count.
+    //    - Delete: Explicitly disallowed.
     //
     // ===============================================================
 
@@ -162,6 +174,13 @@ service cloud.firestore {
       allow read: if false;
       allow create: if isValidFeedback(request.resource.data);
       allow update: if false;
+      allow delete: if false;
+    }
+
+    // Pre-aggregated meal ratings collection (sum and count per day, mess, and meal)
+    match /mealRatings/{dayId} {
+      allow read: if true;
+      allow create, update: if true;
       allow delete: if false;
     }
   }

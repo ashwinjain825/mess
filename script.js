@@ -165,6 +165,28 @@ document.addEventListener("DOMContentLoaded", () => {
       titleGroup.appendChild(nameEl);
       titleGroup.appendChild(timeEl);
 
+      // Meal Right Side: Average rating badge + chevron icon
+      const headerRight = document.createElement("div");
+      headerRight.className = "meal-header-right";
+
+      // Compute average rating from pre-aggregated sum and count
+      const allRatings = window.mealRatings || {};
+      const dayRatings = allRatings[selectedDay] && allRatings[selectedDay][currentMess];
+      const mealStat = dayRatings && dayRatings[meal.id];
+
+      if (mealStat && mealStat.count > 0 && mealStat.sum > 0) {
+        const avg = (mealStat.sum / mealStat.count).toFixed(1);
+        const ratingPill = document.createElement("span");
+        ratingPill.className = "meal-rating-pill";
+        ratingPill.title = `Average rating: ${avg} / 5 (${mealStat.count} review${mealStat.count > 1 ? "s" : ""})`;
+        ratingPill.innerHTML = `
+          <span class="rating-star-icon">★</span>
+          <span>${avg}</span>
+          <span class="rating-count">(${mealStat.count})</span>
+        `;
+        headerRight.appendChild(ratingPill);
+      }
+
       const iconWrapper = document.createElement("span");
       iconWrapper.className = "meal-toggle-icon";
       iconWrapper.innerHTML = `
@@ -173,8 +195,9 @@ document.addEventListener("DOMContentLoaded", () => {
         </svg>
       `;
 
+      headerRight.appendChild(iconWrapper);
       headerBtn.appendChild(titleGroup);
-      headerBtn.appendChild(iconWrapper);
+      headerBtn.appendChild(headerRight);
 
       // Accordion click handler: only one meal card is open at a time
       headerBtn.addEventListener("click", () => {
@@ -277,6 +300,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Re-render automatically when data arrives from Firestore
   window.addEventListener("messMenuUpdated", () => {
     console.log("[App] Updating UI with newly fetched Firestore menu data...");
+    render();
+  });
+
+  // Re-render automatically when pre-aggregated ratings update
+  window.addEventListener("mealRatingsUpdated", () => {
+    console.log("[App] Updating UI with updated meal ratings...");
     render();
   });
 
