@@ -70,10 +70,6 @@ service cloud.firestore {
     //
     // ===============================================================
 
-    // Default deny all access across database
-    match /{document=**} {
-      allow read, write: if false;
-    }
 
     // ===============================================================
     // Helper Functions & Validators
@@ -115,7 +111,7 @@ service cloud.firestore {
 
     // Validate feedbacks document schema on create
     function isValidFeedback(data) {
-      return hasOnlyAllowedFields(['rollNo', 'mess', 'day', 'meal', 'rating', 'comment', 'createdAt']) &&
+      return hasOnlyAllowedFields(['rollNo', 'mess', 'day', 'meal', 'rating', 'comment', 'createdAt', 'read', 'implemented', 'updatedAt']) &&
         // Required fields check
         data.keys().hasAll(['rollNo', 'mess', 'day', 'meal', 'rating', 'createdAt']) &&
         // Field constraints
@@ -169,11 +165,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Admin / Manager credentials collection
+    match /credentials/{userId} {
+      allow read, write: if true;
+    }
+
     // Feedbacks collection
     match /feedbacks/{feedbackId} {
-      allow read: if false;
+      allow read: if true;
       allow create: if isValidFeedback(request.resource.data);
-      allow update: if false;
+      allow update: if true;
       allow delete: if false;
     }
 

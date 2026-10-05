@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mess Feedback Portal &bull; IIITDM Kurnool</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Refined Executive Slate & Warm Off-White Theme */
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --header-bg: #0f172a;
+      --header-text: #ffffff;
+      --header-subtext: #94a3b8;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-faint: #94a3b8;
+      
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      
+      --primary: #0f172a;
+      --primary-hover: #1e293b;
+      --primary-subtle: #f8fafc;
+      
+      --status-done: #047857;
+      --status-done-bg: #ecfdf5;
+      --status-done-border: #a7f3d0;
+
+      --status-read: #475569;
+      --status-read-bg: #f8fafc;
+
+      --status-new: #0f172a;
+      --status-new-bg: #ffffff;
+
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar (Desktop Primary) */
+    .site-nav {
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .site-nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #ffffff;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 2px 7px;
+      border-radius: 3px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .brand-location {
+      font-size: 0.8rem;
+      color: var(--header-subtext);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-tag {
+      font-size: 0.775rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+      padding: 5px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      letter-spacing: 0.02em;
+    }
+
+    .btn-nav {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f1f5f9;
+      font-family: inherit;
+      font-size: 0.775rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-nav:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Main Desktop Page Layout */
+    .page-wrapper {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 24px 60px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Login State */
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background-color: var(--card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 32px 28px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .login-card h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .login-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .form-control {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 9px 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn-login-submit {
+      width: 100%;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-login-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .login-error {
+      color: #991b1b;
+      background-color: #fef2f2;
+      border: 1px solid #fee2e2;
+      font-size: 0.8rem;
+      padding: 9px 12px;
+      border-radius: 5px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .credentials-hint {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .credentials-hint code {
+      background: var(--bg);
+      border: 1px solid var(--border-subtle);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      color: var(--text-main);
+    }
+
+    /* Dashboard Interface */
+    .dashboard-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Metrics & Control Ribbon */
+    .control-ribbon {
+      background-color: var(--card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .ribbon-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Admin Scope Switcher Tab Buttons */
+    .scope-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scope-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .scope-segmented {
+      display: inline-flex;
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+
+    .scope-btn {
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--border-subtle);
+      padding: 6px 16px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .scope-btn:last-child {
+      border-right: none;
+    }
+
+    .scope-btn:hover {
+      color: var(--text-main);
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .scope-btn.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Filter Pills */
+    .filter-pills-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: none;
+      border: 1px solid var(--border-subtle);
+      font-family: inherit;
+      font-size: 0.775rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .filter-pill:hover {
+      background-color: var(--bg);
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+
+    .filter-pill.active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .ribbon-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .select-desktop {
+      font-family: inherit;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .metrics-counter {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .metrics-counter strong {
+      color: var(--text-main);
+    }
+
+    /* Desktop Feedback Grid */
+    .feedbacks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .feedback-card-desktop {
+      background-color: var(--card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .feedback-card-desktop:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .feedback-card-desktop.is-implemented {
+      border-color: var(--status-done-border);
+      background-color: var(--status-done-bg);
+      border-left: 4px solid var(--status-done);
+    }
+
+    /* Card Top Bar */
+    .card-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .meta-badges-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag-mess-name {
+      font-size: 0.725rem;
+      font-weight: 700;
+      background-color: var(--primary);
+      color: #ffffff;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .tag-meal-name {
+      font-size: 0.725rem;
+      font-weight: 600;
+      background-color: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: capitalize;
+    }
+
+    .tag-day-name {
+      font-size: 0.725rem;
+      color: var(--text-muted);
+      text-transform: capitalize;
+    }
+
+    .meta-badges-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .rating-badge {
+      font-size: 0.775rem;
+      font-weight: 700;
+      color: var(--text-main);
+      background-color: var(--bg);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .status-badge {
+      font-size: 0.675rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .status-badge.unread {
+      background-color: #ffffff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .status-badge.read {
+      background-color: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .status-badge.implemented {
+      background-color: var(--status-done);
+      color: #ffffff;
+      border: 1px solid var(--status-done);
+    }
+
+    /* Card Middle Content */
+    .card-content-area {
+      font-size: 0.885rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .card-comment {
+      white-space: pre-wrap;
+    }
+
+    .card-no-comment {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      font-style: italic;
+    }
+
+    /* Card Footer Bar */
+    .card-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .student-info {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .student-roll {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .card-button-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background-color: #ffffff;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-action:hover {
+      background-color: var(--bg);
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .btn-action.btn-read-active {
+      background-color: var(--bg);
+      color: var(--text-main);
+    }
+
+    .btn-action.btn-imp-active {
+      background-color: var(--status-done-bg);
+      border-color: var(--status-done);
+      color: var(--status-done);
+      font-weight: 700;
+    }
+
+    /* Empty State */
+    .empty-state-box {
+      grid-column: 1 / -1;
+      padding: 60px 24px;
+      text-align: center;
+      background-color: var(--card);
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+    }
+
+    .empty-state-box h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .empty-state-box p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .site-footer {
+      background-color: #ffffff;
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px 24px;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    .site-footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .site-footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .site-footer a {
+      color: var(--primary);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .developer-credit {
+      font-size: 0.725rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+      opacity: 0.85;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* Responsive overrides for smaller viewports */
+    @media (max-width: 768px) {
+      .site-nav-inner {
+        padding: 12px 16px;
+      }
+
+      .page-wrapper {
+        padding: 16px 12px 40px 12px;
+      }
+
+      .feedbacks-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .control-ribbon {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px;
+      }
+
+      .ribbon-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .scope-segmented {
+        display: flex;
+      }
+
+      .scope-btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .filter-pills-group {
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .ribbon-right {
+        justify-content: space-between;
+      }
+
+      .card-footer-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .card-button-actions {
+        width: 100%;
+      }
+
+      .card-button-actions .btn-action {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation (Desktop Optimized) -->
+  <header class="site-nav">
+    <div class="site-nav-inner">
+      <div class="brand-group">
+        <span class="brand-title">Mess Feedback</span>
+        <span class="brand-badge">Admin &amp; Managers</span>
+        <span class="brand-location">&bull; IIITDM Kurnool</span>
+      </div>
+
+      <div class="nav-actions" id="headerNavActions" style="display: none;">
+        <span class="user-tag" id="userRoleBadge">User</span>
+        <button type="button" class="btn-nav" id="refreshBtn" title="Sync latest data with Firestore">Refresh Feed</button>
+        <button type="button" class="btn-nav" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Body -->
+  <div class="page-wrapper">
+
+    <!-- 1. Authentication View -->
+    <div class="login-container" id="authSection">
+      <div class="login-card">
+        <h2>Portal Login</h2>
+        <p>Access mess food feedbacks, ratings, and resolution tracking.</p>
+
+        <div class="login-error" id="authErrorMsg"></div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="usernameInput">Username</label>
+            <input type="text" id="usernameInput" class="form-control" placeholder="admin, mess_a, or mess_b" autocomplete="username" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="passwordInput">Password</label>
+            <input type="password" id="passwordInput" class="form-control" placeholder="Enter password" autocomplete="current-password" required>
+          </div>
+
+          <button type="submit" class="btn-login-submit" id="loginSubmitBtn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. Authenticated Dashboard (Desktop Primary) -->
+    <main class="dashboard-layout" id="portalMainSection" style="display: none;">
+      
+      <!-- Metrics & Control Ribbon -->
+      <section class="control-ribbon">
+        <div class="ribbon-left">
+          
+          <!-- Admin Scope Switcher (Only visible to admin) -->
+          <div class="scope-selector-group" id="adminMessBar" style="display: none;">
+            <span class="scope-label">Mess:</span>
+            <div class="scope-segmented" role="group" aria-label="Switch mess scope">
+              <button type="button" class="scope-btn active" data-mess-scope="ALL">All</button>
+              <button type="button" class="scope-btn" data-mess-scope="A">A</button>
+              <button type="button" class="scope-btn" data-mess-scope="B">B</button>
+            </div>
+          </div>
+
+          <!-- Status Filters (Pills) -->
+          <div class="filter-pills-group" role="group" aria-label="Filter status">
+            <button type="button" class="filter-pill active" data-status="ALL">All</button>
+            <button type="button" class="filter-pill" data-status="UNREAD">Unread</button>
+            <button type="button" class="filter-pill" data-status="READ">Read</button>
+            <button type="button" class="filter-pill" data-status="IMPLEMENTED">Implemented</button>
+          </div>
+
+        </div>
+
+        <div class="ribbon-right">
+          <!-- Day Dropdown -->
+          <select id="dayFilter" class="select-desktop" aria-label="Filter by day">
+            <option value="ALL">All Days</option>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+
+          <!-- Meal Dropdown -->
+          <select id="mealFilter" class="select-desktop" aria-label="Filter by meal">
+            <option value="ALL">All Meals</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="snacks">Snacks</option>
+            <option value="dinner">Dinner</option>
+          </select>
+
+          <!-- Counter -->
+          <div class="metrics-counter">
+            <strong id="displayedCount">0</strong> feedbacks
+          </div>
+        </div>
+      </section>
+
+      <!-- Feedback Grid List -->
+      <section class="feedbacks-grid" id="feedbacksList" aria-live="polite">
+        <div class="empty-state-box">
+          <h3>Loading feedbacks...</h3>
+          <p>Connecting to Firestore</p>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-left">
+        <span>Mess Management System &bull; IIITDM Kurnool</span>
+        <span>&bull;</span>
+        <a href="index.html">Public Menu</a>
+      </div>
+      <div class="developer-credit">
+        Developed by Ashwin
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      query,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    // Fallback accounts used if Firestore credentials collection is offline
+    const FALLBACK_ACCOUNTS = {
+      "admin": {
+        password: "admin123",
+        role: "admin",
+        messAccess: "ALL",
+        displayName: "Admin"
+      },
+      "mess_a": {
+        password: "messa123",
+        role: "mess_a",
+        messAccess: "A",
+        displayName: "Mess A Manager"
+      },
+      "messa": {
+        password: "messa123",
+        role: "mess_a",
+        messAccess: "A",
+        displayName: "Mess A Manager"
+      },
+      "mess_b": {
+        password: "messb123",
+        role: "mess_b",
+        messAccess: "B",
+        displayName: "Mess B Manager"
+      },
+      "messb": {
+        password: "messb123",
+        role: "mess_b",
+        messAccess: "B",
+        displayName: "Mess B Manager"
+      }
+    };
+
+    const SESSION_STORAGE_KEY = "mess_feedback_session_user";
+    const LOCAL_FEEDBACK_STATUS_KEY = "mess_feedback_status_overrides";
+
+    // Application State
+    let currentUser = null;
+    let selectedMessFilter = "ALL";
+    let selectedStatusFilter = "ALL";
+    let selectedDayFilter = "ALL";
+    let selectedMealFilter = "ALL";
+    let allFeedbacks = [];
+
+    // Local status override map
+    let statusOverrides = {};
+    try {
+      const stored = localStorage.getItem(LOCAL_FEEDBACK_STATUS_KEY);
+      if (stored) {
+        statusOverrides = JSON.parse(stored);
+      }
+    } catch (e) {
+      statusOverrides = {};
+    }
+
+    function saveStatusOverrides() {
+      try {
+        localStorage.setItem(LOCAL_FEEDBACK_STATUS_KEY, JSON.stringify(statusOverrides));
+      } catch (e) {
+        console.error("Failed to save status overrides to localStorage", e);
+      }
+    }
+
+    // Initialize Firestore
+    let db = null;
+    try {
+      if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+      }
+    } catch (err) {
+      console.warn("[Firestore] Initialization notice:", err);
+    }
+
+    // DOM Elements
+    const authSection = document.getElementById("authSection");
+    const portalMainSection = document.getElementById("portalMainSection");
+    const headerNavActions = document.getElementById("headerNavActions");
+    const userRoleBadge = document.getElementById("userRoleBadge");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const loginForm = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("usernameInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+    const authErrorMsg = document.getElementById("authErrorMsg");
+    const adminMessBar = document.getElementById("adminMessBar");
+    const feedbacksList = document.getElementById("feedbacksList");
+    const dayFilter = document.getElementById("dayFilter");
+    const mealFilter = document.getElementById("mealFilter");
+    const displayedCount = document.getElementById("displayedCount");
+    const filterPills = document.querySelectorAll(".filter-pill");
+
+    // --- Seed / Store Default Credentials in Firestore ---
+    async function ensureCredentialsStoredInFirestore() {
+      if (!db) return;
+      try {
+        const usersToSync = [
+          { id: "admin", password: "admin123", role: "admin", messAccess: "ALL", displayName: "Administrator" },
+          { id: "mess_a", password: "messa123", role: "mess_a", messAccess: "A", displayName: "Mess A Manager" },
+          { id: "mess_b", password: "messb123", role: "mess_b", messAccess: "B", displayName: "Mess B Manager" }
+        ];
+
+        for (const user of usersToSync) {
+          const userDocRef = doc(db, "credentials", user.id);
+          const snap = await getDoc(userDocRef);
+          if (!snap.exists()) {
+            await setDoc(userDocRef, {
+              username: user.id,
+              password: user.password,
+              role: user.role,
+              messAccess: user.messAccess,
+              displayName: user.displayName,
+              createdAt: serverTimestamp()
+            });
+            console.log(`[Firestore] Credential saved to Firestore: credentials/${user.id}`);
+          }
+        }
+      } catch (err) {
+        console.warn("[Firestore] Notice during credentials sync:", err);
+      }
+    }
+
+    // --- Authentication Flow ---
+    async function verifyAndAuthenticate(username, password) {
+      // 1. Fetch credentials from Firestore 'credentials/{username}'
+      if (db) {
+        try {
+          const credDocRef = doc(db, "credentials", username);
+          const credSnap = await getDoc(credDocRef);
+
+          if (credSnap.exists()) {
+            const data = credSnap.data();
+            if (data.password === password) {
+              return {
+                username: username,
+                role: data.role || (username === "admin" ? "admin" : (data.messAccess === "B" ? "mess_b" : "mess_a")),
+                messAccess: data.messAccess || (data.role === "admin" ? "ALL" : "A"),
+                displayName: data.displayName || username.toUpperCase()
+              };
+            } else {
+              return null;
+            }
+          }
+        } catch (err) {
+          console.warn("[Firestore] Unable to fetch user doc from credentials collection:", err);
+        }
+      }
+
+      // 2. Fallback check & automatically store to Firestore
+      const fallbackAccount = FALLBACK_ACCOUNTS[username];
+      if (fallbackAccount && fallbackAccount.password === password) {
+        // If matched from default list, ensure it gets stored into Firestore
+        if (db) {
+          try {
+            const userDocRef = doc(db, "credentials", username);
+            await setDoc(userDocRef, {
+              username: username,
+              password: fallbackAccount.password,
+              role: fallbackAccount.role,
+              messAccess: fallbackAccount.messAccess,
+              displayName: fallbackAccount.displayName,
+              createdAt: serverTimestamp()
+            }, { merge: true });
+            console.log(`[Firestore] Saved credential document: credentials/${username}`);
+          } catch (writeErr) {
+            console.warn("[Firestore] Could not write credential doc to Firestore:", writeErr);
+          }
+        }
+
+        return {
+          username: username,
+          role: fallbackAccount.role,
+          messAccess: fallbackAccount.messAccess,
+          displayName: fallbackAccount.displayName
+        };
+      }
+
+      return null;
+    }
+
+    function checkExistingSession() {
+      try {
+        const session = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        if (session) {
+          const parsed = JSON.parse(session);
+          if (parsed && parsed.username) {
+            currentUser = parsed;
+            applyUserSessionUI();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Error parsing session:", err);
+      }
+      showLoginView();
+    }
+
+    function applyUserSessionUI() {
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+      } catch (e) {}
+
+      if (currentUser.role === "admin") {
+        selectedMessFilter = "ALL";
+      } else {
+        selectedMessFilter = currentUser.messAccess;
+      }
+
+      showPortalView();
+      loadFeedbacks();
+    }
+
+    function logout() {
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      currentUser = null;
+      showLoginView();
+    }
+
+    function showLoginView() {
+      authSection.style.display = "flex";
+      portalMainSection.style.display = "none";
+      headerNavActions.style.display = "none";
+      authErrorMsg.style.display = "none";
+      authErrorMsg.textContent = "";
+      loginForm.reset();
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = "Sign In";
+      usernameInput.focus();
+    }
+
+    function showPortalView() {
+      authSection.style.display = "none";
+      portalMainSection.style.display = "flex";
+      headerNavActions.style.display = "flex";
+
+      userRoleBadge.textContent = currentUser.displayName || currentUser.username;
+
+      if (currentUser.role === "admin") {
+        adminMessBar.style.display = "flex";
+        updateAdminNavButtons();
+      } else {
+        adminMessBar.style.display = "none";
+      }
+    }
+
+    function updateAdminNavButtons() {
+      const buttons = adminMessBar.querySelectorAll(".scope-btn");
+      buttons.forEach(btn => {
+        const scope = btn.getAttribute("data-mess-scope");
+        if (scope === selectedMessFilter) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    let unsubscribeFeedbacksListener = null;
+
+    // --- Data Loading from Firestore ---
+    function loadFeedbacks() {
+      renderLoading();
+
+      // Clean up previous listener if active
+      if (unsubscribeFeedbacksListener) {
+        unsubscribeFeedbacksListener();
+        unsubscribeFeedbacksListener = null;
+      }
+
+      if (!db) {
+        console.warn("[Firestore] No database instance initialized.");
+        allFeedbacks = [];
+        renderFeedbacks();
+        return;
+      }
+
+      try {
+        console.log("[Firestore] Attaching real-time listener to 'feedbacks' collection...");
+        const feedbacksCol = collection(db, "feedbacks");
+        
+        // Listen in real-time so newly submitted feedbacks immediately appear
+        unsubscribeFeedbacksListener = onSnapshot(feedbacksCol, (snapshot) => {
+          allFeedbacks = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+
+            let createdAtTimestamp = Date.now();
+            if (data.createdAt) {
+              if (typeof data.createdAt.toMillis === "function") {
+                createdAtTimestamp = data.createdAt.toMillis();
+              } else if (data.createdAt.seconds) {
+                createdAtTimestamp = data.createdAt.seconds * 1000;
+              } else {
+                createdAtTimestamp = new Date(data.createdAt).getTime() || Date.now();
+              }
+            }
+
+            allFeedbacks.push({
+              id: docSnap.id,
+              rollNo: data.rollNo || "Anonymous",
+              mess: (data.mess || "A").toUpperCase(),
+              day: data.day || "",
+              meal: data.meal || "",
+              rating: Number(data.rating) || 0,
+              comment: data.comment || "",
+              createdAt: createdAtTimestamp,
+              read: data.read === true,
+              implemented: data.implemented === true,
+              fromServer: true
+            });
+          });
+
+          // Merge any client-side overrides if stored
+          allFeedbacks.forEach(item => {
+            if (statusOverrides[item.id]) {
+              if (statusOverrides[item.id].read !== undefined) {
+                item.read = statusOverrides[item.id].read;
+              }
+              if (statusOverrides[item.id].implemented !== undefined) {
+                item.implemented = statusOverrides[item.id].implemented;
+              }
+            }
+          });
+
+          sortFeedbacks();
+          renderFeedbacks();
+        }, (error) => {
+          console.error("[Firestore] Error reading feedbacks collection:", error);
+          const isPermissionDenied = error.code === "permission-denied" || (error.message && error.message.includes("permission"));
+          feedbacksList.innerHTML = `
+            <div class="empty-state-box" style="text-align: left; max-width: 600px; margin: 20px auto;">
+              <h3 style="color: #b91c1c; margin-bottom: 8px;">Firebase Permission Denied</h3>
+              <p style="color: #475569; font-size: 0.85rem; margin-bottom: 12px;">
+                Firestore rejected the read request because the updated security rules in <code>firestore.rules</code> have not yet been deployed to your live Firebase project (<strong>bhati-mess</strong>).
+              </p>
+              <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 14px; font-size: 0.8rem; line-height: 1.6;">
+                <strong>Quick Fix:</strong><br>
+                1. Open <a href="https://console.firebase.google.com/project/bhati-mess/firestore/rules" target="_blank" rel="noopener" style="color: #0284c7; text-decoration: underline; font-weight: 600;">Firebase Console &rarr; Firestore &rarr; Rules</a>.<br>
+                2. Paste the updated rules from your local <code>firestore.rules</code> file.<br>
+                3. Click <strong>Publish</strong> and then click <strong>Refresh Feed</strong> above.
+              </div>
+            </div>
+          `;
+        });
+
+      } catch (err) {
+        console.error("[Firestore] Exception subscribing to feedbacks:", err);
+        feedbacksList.innerHTML = `
+          <div class="empty-state-box">
+            <h3>Unable to Load Feedbacks</h3>
+            <p>${escapeHtml(err.message || "An unexpected error occurred.")}</p>
+          </div>
+        `;
+      }
+    }
+
+    function sortFeedbacks() {
+      allFeedbacks.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    function renderLoading() {
+      feedbacksList.innerHTML = `
+        <div class="empty-state-box">
+          <h3>Loading feedbacks...</h3>
+          <p>Fetching records from Firestore database</p>
+        </div>
+      `;
+    }
+
+    function renderFeedbacks() {
+      // 1. Role-based Mess Filter
+      let filtered = allFeedbacks.filter(item => {
+        if (currentUser.role === "mess_a") {
+          return item.mess === "A";
+        }
+        if (currentUser.role === "mess_b") {
+          return item.mess === "B";
+        }
+        if (selectedMessFilter === "A") return item.mess === "A";
+        if (selectedMessFilter === "B") return item.mess === "B";
+        return true;
+      });
+
+      // 2. Status Filter
+      if (selectedStatusFilter === "UNREAD") {
+        filtered = filtered.filter(item => !item.read);
+      } else if (selectedStatusFilter === "READ") {
+        filtered = filtered.filter(item => item.read && !item.implemented);
+      } else if (selectedStatusFilter === "IMPLEMENTED") {
+        filtered = filtered.filter(item => item.implemented);
+      }
+
+      // 3. Day Filter
+      if (selectedDayFilter !== "ALL") {
+        filtered = filtered.filter(item => (item.day || "").toLowerCase() === selectedDayFilter.toLowerCase());
+      }
+
+      // 4. Meal Filter
+      if (selectedMealFilter !== "ALL") {
+        filtered = filtered.filter(item => (item.meal || "").toLowerCase() === selectedMealFilter.toLowerCase());
+      }
+
+      displayedCount.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        feedbacksList.innerHTML = `
+          <div class="empty-state-box">
+            <h3>No feedbacks found</h3>
+            <p>No records match the current filter and mess scope.</p>
+          </div>
+        `;
+        return;
+      }
+
+      feedbacksList.innerHTML = filtered.map(item => createFeedbackCardHTML(item)).join("");
+      attachCardListeners();
+    }
+
+    function formatFullTimestamp(ms) {
+      if (!ms) return "";
+      const d = new Date(ms);
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) + " at " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function createFeedbackCardHTML(item) {
+      const isRead = item.read === true;
+      const isImplemented = item.implemented === true;
+
+      let cardClass = "feedback-card-desktop";
+      if (isImplemented) cardClass += " is-implemented";
+
+      let statusBadgeHTML = "";
+      if (isImplemented) {
+        statusBadgeHTML = `<span class="status-badge implemented">Implemented</span>`;
+      } else if (isRead) {
+        statusBadgeHTML = `<span class="status-badge read">Read</span>`;
+      } else {
+        statusBadgeHTML = `<span class="status-badge unread">Unread</span>`;
+      }
+
+      const readBtnClass = isRead ? "btn-action btn-read-active" : "btn-action";
+      const readBtnText = isRead ? "Mark as Unread" : "Mark as Read";
+
+      const impBtnClass = isImplemented ? "btn-action btn-imp-active" : "btn-action";
+      const impBtnText = isImplemented ? "Implemented" : "Mark Implemented";
+
+      return `
+        <article class="${cardClass}" data-id="${escapeHtml(item.id)}">
+          <div class="card-meta-bar">
+            <div class="meta-badges-left">
+              <span class="tag-mess-name">Mess ${escapeHtml(item.mess)}</span>
+              <span class="tag-meal-name">${escapeHtml(item.meal)}</span>
+              <span class="tag-day-name">${escapeHtml(item.day)}</span>
+            </div>
+            <div class="meta-badges-right">
+              <span class="rating-badge">${item.rating} / 5</span>
+              ${statusBadgeHTML}
+            </div>
+          </div>
+
+          <div class="card-content-area">
+            ${item.comment ? `
+              <div class="card-comment">${escapeHtml(item.comment)}</div>
+            ` : `
+              <div class="card-no-comment">No additional written comment.</div>
+            `}
+          </div>
+
+          <div class="card-footer-bar">
+            <div class="student-info">
+              ${currentUser && currentUser.role === "admin" ? `
+                <span class="student-roll">${escapeHtml(item.rollNo)}</span>
+                <span>&bull;</span>
+              ` : ""}
+              <span>${formatFullTimestamp(item.createdAt)}</span>
+            </div>
+
+            <div class="card-button-actions">
+              <button type="button" class="${readBtnClass} btn-toggle-read" data-id="${escapeHtml(item.id)}">
+                ${readBtnText}
+              </button>
+              <button type="button" class="${impBtnClass} btn-toggle-imp" data-id="${escapeHtml(item.id)}">
+                ${impBtnText}
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function attachCardListeners() {
+      feedbacksList.querySelectorAll(".btn-toggle-read").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          toggleFeedbackReadStatus(id);
+        });
+      });
+
+      feedbacksList.querySelectorAll(".btn-toggle-imp").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          toggleFeedbackImplementedStatus(id);
+        });
+      });
+    }
+
+    async function toggleFeedbackReadStatus(id) {
+      const item = allFeedbacks.find(f => f.id === id);
+      if (!item) return;
+
+      const nextRead = !item.read;
+      item.read = nextRead;
+
+      if (!nextRead && item.implemented) {
+        item.implemented = false;
+      }
+
+      if (!statusOverrides[id]) statusOverrides[id] = {};
+      statusOverrides[id].read = item.read;
+      statusOverrides[id].implemented = item.implemented;
+      statusOverrides[id].updatedAt = new Date().toISOString();
+      saveStatusOverrides();
+
+      if (db && item.fromServer) {
+        try {
+          const docRef = doc(db, "feedbacks", id);
+          await updateDoc(docRef, {
+            read: item.read,
+            implemented: item.implemented,
+            updatedAt: serverTimestamp()
+          });
+        } catch (err) {
+          console.warn("[Firestore] Could not sync read status:", err);
+        }
+      }
+
+      renderFeedbacks();
+    }
+
+    async function toggleFeedbackImplementedStatus(id) {
+      const item = allFeedbacks.find(f => f.id === id);
+      if (!item) return;
+
+      const nextImplemented = !item.implemented;
+      item.implemented = nextImplemented;
+
+      if (nextImplemented) {
+        item.read = true;
+      }
+
+      if (!statusOverrides[id]) statusOverrides[id] = {};
+      statusOverrides[id].read = item.read;
+      statusOverrides[id].implemented = item.implemented;
+      statusOverrides[id].updatedAt = new Date().toISOString();
+      saveStatusOverrides();
+
+      if (db && item.fromServer) {
+        try {
+          const docRef = doc(db, "feedbacks", id);
+          await updateDoc(docRef, {
+            read: item.read,
+            implemented: item.implemented,
+            updatedAt: serverTimestamp()
+          });
+        } catch (err) {
+          console.warn("[Firestore] Could not sync implemented status:", err);
+        }
+      }
+
+      renderFeedbacks();
+    }
+
+    // --- Event Listeners ---
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = usernameInput.value.trim().toLowerCase();
+      const password = passwordInput.value.trim();
+
+      loginSubmitBtn.disabled = true;
+      loginSubmitBtn.textContent = "Verifying...";
+      authErrorMsg.style.display = "none";
+
+      try {
+        const userSession = await verifyAndAuthenticate(username, password);
+
+        if (!userSession) {
+          authErrorMsg.textContent = "Invalid username or password.";
+          authErrorMsg.style.display = "block";
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = "Sign In";
+          passwordInput.value = "";
+          passwordInput.focus();
+          return;
+        }
+
+        currentUser = userSession;
+        applyUserSessionUI();
+      } catch (err) {
+        console.error("Login verification error:", err);
+        authErrorMsg.textContent = "Error authenticating. Please try again.";
+        authErrorMsg.style.display = "block";
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = "Sign In";
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      logout();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      loadFeedbacks();
+    });
+
+    // Admin mess switch buttons
+    adminMessBar.querySelectorAll(".scope-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedMessFilter = btn.getAttribute("data-mess-scope");
+        updateAdminNavButtons();
+        renderFeedbacks();
+      });
+    });
+
+    // Filter Pills
+    filterPills.forEach(pill => {
+      pill.addEventListener("click", () => {
+        filterPills.forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        selectedStatusFilter = pill.getAttribute("data-status");
+        renderFeedbacks();
+      });
+    });
+
+    dayFilter.addEventListener("change", (e) => {
+      selectedDayFilter = e.target.value;
+      renderFeedbacks();
+    });
+
+    mealFilter.addEventListener("change", (e) => {
+      selectedMealFilter = e.target.value;
+      renderFeedbacks();
+    });
+
+    // Initialize
+    ensureCredentialsStoredInFirestore();
+    checkExistingSession();
+  </script>
+</body>
+</html>

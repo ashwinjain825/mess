@@ -734,6 +734,8 @@ export async function submitFeedback(feedbackData) {
       meal: mealKey,
       rating: ratingVal,
       comment: String(feedbackData.comment || "").trim(),
+      read: false,
+      implemented: false,
       createdAt: serverTimestamp()
     });
 
